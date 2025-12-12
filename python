@@ -1,0 +1,67 @@
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
+app = FastAPI()
+
+# Input model: This is what the Front-Line Sub sends to the Server
+class Interaction(BaseModel):
+    customer_message: str
+    front_line_id: str # ID of the sub talking to the customer
+
+# --- LEVEL 3: THE WORKER SUBS (Hidden from customer) ---
+# These do the heavy lifting when Main AI tells them to.
+
+def worker_sub_billing(details):
+    # Logic: Checks database for money issues
+    return f"REFUND APPROVED for issue: {details}"
+
+def worker_sub_tech_support(details):
+    # Logic: Checks server logs for bugs
+    return f"SYSTEM REBOOTED to fix: {details}"
+
+# --- LEVEL 2: THE MAIN AI (The Boss) ---
+# It sits in the center. It doesn't talk to customers directly; 
+# it talks to the Front-Line Subs and the Worker Subs.
+
+def main_ai_central_processor(message):
+    print(f"[MAIN AI] Analyizing request: {message}")
+    
+    # Main AI decides which Worker is needed
+    if "money" in message or "refund" in message:
+        print("[MAIN AI] Assigning to Billing Worker...")
+        result = worker_sub_billing(message)
+    elif "broken" in message or "error" in message:
+        print("[MAIN AI] Assigning to Tech Worker...")
+        result = worker_sub_tech_support(message)
+    else:
+        result = "Request logged for human review."
+        
+    # Main AI approves the result
+    print(f"[MAIN AI] Result verified: {result}")
+    return result
+
+# --- LEVEL 1: THE FRONT-LINE INTERFACE (API Endpoint) ---
+# This represents the connection to the Front-Line Subs on the website.
+
+@app.post("/process_request")
+async def front_line_connection(interaction: Interaction):
+    # 1. Front-Line Sub sends data to Server
+    user_msg = interaction.customer_message.lower()
+    sub_id = interaction.front_line_id
+    
+    print(f"--- Incoming transmission from Front-Line Sub {sub_id} ---")
+    
+    # 2. Server (Main AI) processes it
+    solution = main_ai_central_processor(user_msg)
+    
+    # 3. Server sends instructions back to Front-Line Sub
+    return {
+        "status": "success",
+        "instruction_to_front_line": f"Tell customer: {solution}",
+        "main_ai_log": "Task delegated and verified."
+    }
+
+# Health Check
+@app.get("/")
+def system_status():
+    return {"status": "Central Main AI Online", "connected_subs": "Ready"}
