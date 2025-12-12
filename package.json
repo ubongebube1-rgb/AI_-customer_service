@@ -1,0 +1,23 @@
+{
+  "name": "ai-customer-service",
+  "version": "1.0.0",
+  "description": "AI Customer Service Application with Voice Integration",
+  "private": true,
+  "scripts": {
+    "dev": "python app.py",
+    "build": "echo 'Build complete'",
+    "start": "python app.py"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^1.0.0"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "ai",
+    "customer-service",
+    "voice",
+    "flask"
+  ],
+  "author": "",
+  "license": "ISC"
+}
