@@ -1,0 +1,553 @@
+import React, { useState } from 'react';
+import { ChevronDown, ChevronRight, Check } from 'lucide-react';
+
+const TechSpecs = () => {
+  const [expandedSections, setExpandedSections] = useState({});
+
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
+  const Section = ({ id, title, children }) => (
+    <div className="mb-4 border border-gray-200 rounded-lg overflow-hidden">
+      <button
+        onClick={() => toggleSection(id)}
+        className="w-full px-6 py-4 bg-gray-50 hover:bg-gray-100 flex items-center justify-between text-left transition-colors"
+      >
+        <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+        {expandedSections[id] ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+      </button>
+      {expandedSections[id] && (
+        <div className="px-6 py-4 bg-white">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="max-w-5xl mx-auto p-6 bg-gray-50 min-h-screen">
+      <div className="bg-white rounded-lg shadow-sm p-8 mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">AI Supervisor-Worker System</h1>
+        <p className="text-lg text-gray-600 mb-4">Technical Specifications v1.0</p>
+        <div className="flex items-start gap-2 text-sm text-gray-500">
+          <Check size={16} className="mt-0.5 flex-shrink-0 text-green-600" />
+          <span>Scalable architecture for customer service automation using delegated AI processing</span>
+        </div>
+      </div>
+
+      <Section id="overview" title="1. System Overview">
+        <div className="space-y-4">
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">Purpose</h3>
+            <p className="text-gray-700">Build a scalable AI-powered customer service system using a Supervisor-Worker architecture pattern to efficiently route, process, and resolve customer requests across multiple specialized domains.</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">Architecture Pattern</h3>
+            <p className="text-gray-700">Three-tier hierarchical model: Front-Line AI (customer interface) → Main Supervisor AI (coordinator) → Sub-AI Workers (specialists)</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">Key Design Goals</h3>
+            <ul className="list-disc list-inside text-gray-700 space-y-1 ml-2">
+              <li>Efficient task delegation based on request categorization</li>
+              <li>Verification layer to ensure response quality</li>
+              <li>Easy extensibility for adding new specialized workers</li>
+              <li>Clear separation of concerns across AI components</li>
+            </ul>
+          </div>
+        </div>
+      </Section>
+
+      <Section id="components" title="2. System Components">
+        <div className="space-y-6">
+          <div className="border-l-4 border-blue-500 pl-4">
+            <h3 className="font-semibold text-gray-900 mb-2">2.1 Front-Line AI (Worker)</h3>
+            <p className="text-gray-700 mb-3"><strong>Role:</strong> Customer-facing interface and communication handler</p>
+            <div className="bg-gray-50 p-4 rounded">
+              <p className="font-medium text-gray-900 mb-2">Responsibilities:</p>
+              <ul className="list-disc list-inside text-gray-700 space-y-1 ml-2">
+                <li>Receive initial customer messages via REST API endpoint</li>
+                <li>Forward requests to Main Supervisor AI</li>
+                <li>Receive formatted responses from Supervisor</li>
+                <li>Deliver final resolution to customer</li>
+                <li>Maintain conversation context and session state</li>
+              </ul>
+            </div>
+            <div className="mt-3 bg-blue-50 p-3 rounded text-sm">
+              <p className="font-medium text-blue-900 mb-1">Technical Implementation:</p>
+              <p className="text-blue-800">FastAPI endpoint with async request handling, session management, and response formatting</p>
+            </div>
+          </div>
+
+          <div className="border-l-4 border-purple-500 pl-4">
+            <h3 className="font-semibold text-gray-900 mb-2">2.2 Main Supervisor AI (Coordinator)</h3>
+            <p className="text-gray-700 mb-3"><strong>Role:</strong> Central intelligence and routing engine</p>
+            <div className="bg-gray-50 p-4 rounded">
+              <p className="font-medium text-gray-900 mb-2">Responsibilities:</p>
+              <ul className="list-disc list-inside text-gray-700 space-y-1 ml-2">
+                <li>Analyze incoming customer requests</li>
+                <li>Apply keyword-based classification logic</li>
+                <li>Route to appropriate Sub-AI Worker</li>
+                <li>Verify Sub-AI responses for completeness and accuracy</li>
+                <li>Format final solution for customer delivery</li>
+                <li>Escalate to human review when needed</li>
+              </ul>
+            </div>
+            <div className="mt-3 bg-purple-50 p-3 rounded text-sm">
+              <p className="font-medium text-purple-900 mb-1">Classification Logic:</p>
+              <p className="text-purple-800">Keyword matching with priority scoring (e.g., 'refund', 'money' → Billing; 'error', 'broken' → Tech Support; unmatched → Human Review)</p>
+            </div>
+          </div>
+
+          <div className="border-l-4 border-green-500 pl-4">
+            <h3 className="font-semibold text-gray-900 mb-2">2.3 Sub-AI Workers (Specialists)</h3>
+            <p className="text-gray-700 mb-3"><strong>Role:</strong> Domain-specific problem solvers</p>
+            
+            <div className="space-y-4">
+              <div className="bg-gray-50 p-4 rounded">
+                <p className="font-semibold text-gray-900 mb-2">Billing Sub-AI</p>
+                <ul className="list-disc list-inside text-gray-700 space-y-1 ml-2">
+                  <li>Process refund requests and approvals</li>
+                  <li>Handle payment inquiries and billing disputes</li>
+                  <li>Access billing database for account verification</li>
+                  <li>Generate transaction summaries</li>
+                </ul>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded">
+                <p className="font-semibold text-gray-900 mb-2">Tech Support Sub-AI</p>
+                <ul className="list-disc list-inside text-gray-700 space-y-1 ml-2">
+                  <li>Diagnose technical issues</li>
+                  <li>Provide troubleshooting steps</li>
+                  <li>Execute system reboots/resets when authorized</li>
+                  <li>Access error logs and system status</li>
+                </ul>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded">
+                <p className="font-semibold text-gray-900 mb-2">Human Review Queue</p>
+                <ul className="list-disc list-inside text-gray-700 space-y-1 ml-2">
+                  <li>Capture unclassified requests</li>
+                  <li>Store complex edge cases</li>
+                  <li>Provide dashboard for human agent review</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="mt-3 bg-green-50 p-3 rounded text-sm">
+              <p className="font-medium text-green-900 mb-1">Extensibility:</p>
+              <p className="text-green-800">New Sub-AI workers can be added by implementing the base worker interface and registering keywords in the supervisor's routing table</p>
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      <Section id="dataflow" title="3. Data Flow Architecture">
+        <div className="space-y-4">
+          <div className="bg-blue-50 border border-blue-200 rounded p-4">
+            <p className="font-semibold text-blue-900 mb-3">Request Processing Flow:</p>
+            <ol className="space-y-2 text-blue-800">
+              <li className="flex items-start gap-2">
+                <span className="font-semibold bg-blue-200 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm">1</span>
+                <span>Customer sends message to Front-Line AI via POST /api/message</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="font-semibold bg-blue-200 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm">2</span>
+                <span>Front-Line AI forwards to Supervisor AI via internal service call</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="font-semibold bg-blue-200 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm">3</span>
+                <span>Supervisor analyzes message content and extracts keywords</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="font-semibold bg-blue-200 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm">4</span>
+                <span>Supervisor routes to appropriate Sub-AI Worker or Human Review</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="font-semibold bg-blue-200 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm">5</span>
+                <span>Sub-AI processes request and returns proposed solution</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="font-semibold bg-blue-200 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm">6</span>
+                <span>Supervisor verifies solution (checks completeness, tone, accuracy)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="font-semibold bg-blue-200 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm">7</span>
+                <span>Supervisor formats final response with customer-friendly language</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="font-semibold bg-blue-200 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm">8</span>
+                <span>Front-Line AI delivers response to customer</span>
+              </li>
+            </ol>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">Message Schema</h3>
+            <pre className="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm">
+{`{
+  "request_id": "uuid",
+  "customer_id": "string",
+  "message": "string",
+  "timestamp": "ISO8601",
+  "context": {
+    "session_id": "string",
+    "conversation_history": []
+  }
+}`}
+            </pre>
+          </div>
+        </div>
+      </Section>
+
+      <Section id="tech-stack" title="4. Technology Stack">
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="bg-gray-50 p-4 rounded">
+            <h3 className="font-semibold text-gray-900 mb-3">Backend Framework</h3>
+            <ul className="space-y-2 text-gray-700">
+              <li><strong>Language:</strong> Python 3.11+</li>
+              <li><strong>API Framework:</strong> FastAPI 0.104+</li>
+              <li><strong>Async Runtime:</strong> asyncio with uvicorn</li>
+              <li><strong>AI Integration:</strong> OpenAI API / Anthropic Claude API</li>
+            </ul>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded">
+            <h3 className="font-semibold text-gray-900 mb-3">Infrastructure</h3>
+            <ul className="space-y-2 text-gray-700">
+              <li><strong>Deployment:</strong> Vercel / Render / Railway</li>
+              <li><strong>Database:</strong> PostgreSQL with asyncpg</li>
+              <li><strong>Caching:</strong> Redis for session management</li>
+              <li><strong>Monitoring:</strong> Sentry for error tracking</li>
+            </ul>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded">
+            <h3 className="font-semibold text-gray-900 mb-3">Key Dependencies</h3>
+            <pre className="text-xs bg-gray-900 text-gray-100 p-3 rounded overflow-x-auto mt-2">
+{`fastapi==0.104.1
+uvicorn[standard]==0.24.0
+anthropic==0.7.0
+pydantic==2.5.0
+asyncpg==0.29.0
+redis==5.0.1
+python-dotenv==1.0.0`}
+            </pre>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded">
+            <h3 className="font-semibold text-gray-900 mb-3">Testing & Quality</h3>
+            <ul className="space-y-2 text-gray-700">
+              <li><strong>Testing:</strong> pytest with pytest-asyncio</li>
+              <li><strong>Type Checking:</strong> mypy</li>
+              <li><strong>Linting:</strong> ruff</li>
+              <li><strong>Coverage:</strong> pytest-cov (target: 80%+)</li>
+            </ul>
+          </div>
+        </div>
+      </Section>
+
+      <Section id="api-design" title="5. API Design">
+        <div className="space-y-4">
+          <div className="border border-gray-200 rounded p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-semibold">POST</span>
+              <code className="text-sm text-gray-900">/api/v1/message</code>
+            </div>
+            <p className="text-gray-700 mb-3">Submit customer service request</p>
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-gray-900">Request Body:</p>
+              <pre className="bg-gray-900 text-gray-100 p-3 rounded text-xs overflow-x-auto">
+{`{
+  "customer_id": "cust_123",
+  "message": "I need a refund for order #456",
+  "session_id": "sess_abc" // optional
+}`}
+              </pre>
+              <p className="text-sm font-semibold text-gray-900 mt-3">Response:</p>
+              <pre className="bg-gray-900 text-gray-100 p-3 rounded text-xs overflow-x-auto">
+{`{
+  "request_id": "req_789",
+  "response": "I'll process your refund...",
+  "routed_to": "billing",
+  "status": "resolved",
+  "timestamp": "2024-01-15T10:30:00Z"
+}`}
+              </pre>
+            </div>
+          </div>
+
+          <div className="border border-gray-200 rounded p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">GET</span>
+              <code className="text-sm text-gray-900">/api/v1/status/{`{request_id}`}</code>
+            </div>
+            <p className="text-gray-700">Check request processing status</p>
+          </div>
+
+          <div className="border border-gray-200 rounded p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs font-semibold">GET</span>
+              <code className="text-sm text-gray-900">/api/v1/human-review/queue</code>
+            </div>
+            <p className="text-gray-700">Retrieve pending human review items (admin only)</p>
+          </div>
+        </div>
+      </Section>
+
+      <Section id="routing-logic" title="6. Supervisor Routing Logic">
+        <div className="space-y-4">
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">Keyword Classification System</h3>
+            <p className="text-gray-700 mb-3">The Supervisor uses a weighted keyword matching algorithm with priority scoring:</p>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-300">
+                  <th className="text-left py-2 font-semibold text-gray-900">Category</th>
+                  <th className="text-left py-2 font-semibold text-gray-900">Keywords</th>
+                  <th className="text-left py-2 font-semibold text-gray-900">Weight</th>
+                </tr>
+              </thead>
+              <tbody className="text-gray-700">
+                <tr className="border-b border-gray-200">
+                  <td className="py-2">Billing</td>
+                  <td className="py-2">refund, money, payment, charge, invoice, bill</td>
+                  <td className="py-2">High (0.9)</td>
+                </tr>
+                <tr className="border-b border-gray-200">
+                  <td className="py-2">Tech Support</td>
+                  <td className="py-2">error, broken, crash, bug, not working, issue</td>
+                  <td className="py-2">High (0.9)</td>
+                </tr>
+                <tr className="border-b border-gray-200">
+                  <td className="py-2">Account</td>
+                  <td className="py-2">password, login, reset, access, account</td>
+                  <td className="py-2">Medium (0.7)</td>
+                </tr>
+                <tr>
+                  <td className="py-2">Default</td>
+                  <td className="py-2">No matches or score below 0.5</td>
+                  <td className="py-2">Human Review</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className="bg-purple-50 border border-purple-200 rounded p-4">
+            <p className="font-semibold text-purple-900 mb-2">Routing Algorithm:</p>
+            <ol className="text-purple-800 space-y-1 ml-4 list-decimal">
+              <li>Tokenize and normalize customer message (lowercase, remove stopwords)</li>
+              <li>Calculate weighted score for each category based on keyword matches</li>
+              <li>Select category with highest score if above threshold (0.5)</li>
+              <li>Route to corresponding Sub-AI Worker</li>
+              <li>If no category exceeds threshold, route to Human Review Queue</li>
+            </ol>
+          </div>
+        </div>
+      </Section>
+
+      <Section id="verification" title="7. Verification & Quality Control">
+        <div className="space-y-4">
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">Supervisor Verification Checks</h3>
+            <p className="text-gray-700 mb-3">Before forwarding responses to Front-Line AI, the Supervisor performs:</p>
+          </div>
+
+          <div className="space-y-3">
+            <div className="border-l-4 border-green-500 bg-green-50 p-3">
+              <p className="font-semibold text-green-900">Completeness Check</p>
+              <p className="text-green-800 text-sm">Ensures response addresses all parts of customer query</p>
+            </div>
+
+            <div className="border-l-4 border-blue-500 bg-blue-50 p-3">
+              <p className="font-semibold text-blue-900">Tone Verification</p>
+              <p className="text-blue-800 text-sm">Validates professional, empathetic, customer-friendly language</p>
+            </div>
+
+            <div className="border-l-4 border-purple-500 bg-purple-50 p-3">
+              <p className="font-semibold text-purple-900">Accuracy Validation</p>
+              <p className="text-purple-800 text-sm">Checks for logical consistency and factual accuracy</p>
+            </div>
+
+            <div className="border-l-4 border-yellow-500 bg-yellow-50 p-3">
+              <p className="font-semibold text-yellow-900">Format Standardization</p>
+              <p className="text-yellow-800 text-sm">Applies consistent formatting, removes internal jargon</p>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded">
+            <p className="font-semibold text-gray-900 mb-2">Fallback Handling</p>
+            <p className="text-gray-700">If verification fails, Supervisor can: (1) Request Sub-AI revision, (2) Apply corrections directly, or (3) Escalate to human review if unresolvable</p>
+          </div>
+        </div>
+      </Section>
+
+      <Section id="deployment" title="8. Deployment Configuration">
+        <div className="space-y-4">
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">Platform Recommendations</h3>
+            <div className="grid md:grid-cols-3 gap-3">
+              <div className="bg-gray-50 p-3 rounded border border-gray-200">
+                <p className="font-semibold text-gray-900 mb-1">Vercel</p>
+                <p className="text-sm text-gray-600">Best for: Serverless with edge functions</p>
+              </div>
+              <div className="bg-gray-50 p-3 rounded border border-gray-200">
+                <p className="font-semibold text-gray-900 mb-1">Render</p>
+                <p className="text-sm text-gray-600">Best for: Persistent services with DB</p>
+              </div>
+              <div className="bg-gray-50 p-3 rounded border border-gray-200">
+                <p className="font-semibold text-gray-900 mb-1">Railway</p>
+                <p className="text-sm text-gray-600">Best for: Full-stack with managed DB</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">Environment Variables</h3>
+            <pre className="bg-gray-900 text-gray-100 p-4 rounded text-xs overflow-x-auto">
+{`# Required
+ANTHROPIC_API_KEY=sk-ant-...
+DATABASE_URL=postgresql://...
+REDIS_URL=redis://...
+
+# Optional
+ENVIRONMENT=production
+LOG_LEVEL=INFO
+MAX_WORKERS=10
+VERIFICATION_THRESHOLD=0.5`}
+            </pre>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">Sample vercel.json</h3>
+            <pre className="bg-gray-900 text-gray-100 p-4 rounded text-xs overflow-x-auto">
+{`{
+  "version": 2,
+  "builds": [
+    {
+      "src": "main.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "main.py"
+    }
+  ],
+  "env": {
+    "ANTHROPIC_API_KEY": "@anthropic_api_key",
+    "DATABASE_URL": "@database_url"
+  }
+}`}
+            </pre>
+          </div>
+        </div>
+      </Section>
+
+      <Section id="scalability" title="9. Scalability & Extensibility">
+        <div className="space-y-4">
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">Adding New Sub-AI Workers</h3>
+            <p className="text-gray-700 mb-3">The architecture supports easy extension through a plug-and-play worker interface:</p>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded">
+            <pre className="text-xs text-gray-800 overflow-x-auto">
+{`# Base Worker Interface
+class BaseWorker:
+    async def process(self, message: str) -> str:
+        raise NotImplementedError
+
+# Example: Adding a new "Shipping" worker
+class ShippingWorker(BaseWorker):
+    keywords = ["delivery", "shipping", "tracking"]
+    
+    async def process(self, message: str) -> str:
+        # Implementation for shipping queries
+        return response
+
+# Register in supervisor's routing table
+supervisor.register_worker("shipping", ShippingWorker())`}
+            </pre>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">Horizontal Scaling</h3>
+            <ul className="list-disc list-inside text-gray-700 space-y-2 ml-2">
+              <li>Load balancer distributes requests across multiple Front-Line AI instances</li>
+              <li>Supervisor AI can run multiple worker processes for parallel processing</li>
+              <li>Redis session store enables stateless scaling</li>
+              <li>Database connection pooling handles concurrent requests</li>
+            </ul>
+          </div>
+
+          <div className="bg-blue-50 border border-blue-200 rounded p-4">
+            <p className="font-semibold text-blue-900 mb-2">Performance Targets</p>
+            <ul className="text-blue-800 space-y-1 ml-4 list-disc">
+              <li>Response time: &lt; 3 seconds for 95th percentile</li>
+              <li>Throughput: 100+ requests/second per instance</li>
+              <li>Availability: 99.9% uptime SLA</li>
+            </ul>
+          </div>
+        </div>
+      </Section>
+
+      <Section id="security" title="10. Security & Compliance">
+        <div className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="bg-red-50 border border-red-200 rounded p-4">
+              <h3 className="font-semibold text-red-900 mb-2">Authentication</h3>
+              <ul className="text-red-800 space-y-1 text-sm ml-4 list-disc">
+                <li>API key authentication for all endpoints</li>
+                <li>JWT tokens for customer sessions</li>
+                <li>Rate limiting per customer/IP</li>
+              </ul>
+            </div>
+
+            <div className="bg-orange-50 border border-orange-200 rounded p-4">
+              <h3 className="font-semibold text-orange-900 mb-2">Data Protection</h3>
+              <ul className="text-orange-800 space-y-1 text-sm ml-4 list-disc">
+                <li>Encryption at rest and in transit (TLS 1.3)</li>
+                <li>PII data masking in logs</li>
+                <li>GDPR-compliant data retention policies</li>
+              </ul>
+            </div>
+
+            <div className="bg-yellow-50 border border-yellow-200 rounded p-4">
+              <h3 className="font-semibold text-yellow-900 mb-2">Audit & Logging</h3>
+              <ul className="text-yellow-800 space-y-1 text-sm ml-4 list-disc">
+                <li>All requests logged with unique IDs</li>
+                <li>Audit trail for routing decisions</li>
+                <li>Alert system for anomalies</li>
+              </ul>
+            </div>
+
+            <div className="bg-green-50 border border-green-200 rounded p-4">
+              <h3 className="font-semibold text-green-900 mb-2">AI Safety</h3>
+              <ul className="text-green-800 space-y-1 text-sm ml-4 list-disc">
+                <li>Content filtering on inputs/outputs</li>
+                <li>Hallucination detection mechanisms</li>
+                <li>Human-in-the-loop for sensitive topics</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      <Section id="monitoring" title="11. Monitoring & Observability">
+        <div className="space-y-4">
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">Key Metrics to Track</h3>
+            <div className="bg-gray-50 p-4 rounded">
+              <ul className="text-gray-700 space-y-2">
+                <li><strong>Request Volume:</strong> Total messages/hour by category</li>
+                <li><strong>Response Time:</strong> P50, P95, P99 latencies per component</li>
+                <li><strong>Routing Accuracy:</strong> % correctly classified by Supervisor</li>
+                <li><strong>Verification Pass Rate:</strong> % responses
