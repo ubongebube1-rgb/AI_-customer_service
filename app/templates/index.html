@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer AI - Beast Mode</title>
+    <style>
+        /* BEAST MODE DARK THEME */
+        body {
+            background-color: #0d0d0d;
+            color: #00ffcc;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            border: 1px solid #333;
+            background-color: #1a1a1a;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.1);
+            width: 450px;
+            text-align: center;
+        }
+        /* AI Visual Avatar */
+        .agent-visual {
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, #00ffcc 10%, #1a1a1a 80%);
+            border-radius: 50%;
+            margin: 0 auto 20px auto;
+            border: 2px solid #00ffcc;
+            transition: all 0.3s ease;
+        }
+        /* Animation when AI is speaking */
+        .speaking {
+            animation: pulse-ring 1.5s infinite;
+            box-shadow: 0 0 20px #00ffcc;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.7; }
+        }
+        .status-text {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 20px;
+            height: 20px;
+        }
+        /* Mic Button */
+        .mic-btn {
+            background: #00ffcc;
+            color: #000;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0,255,204,0.5);
+            transition: transform 0.2s;
+        }
+        .mic-btn:active { transform: scale(0.9); }
+        .mic-btn.listening {
+            background: #ff3333; 
+            box-shadow: 0 0 15px rgba(255, 51, 51, 0.5);
+        }
+        #chat-log {
+            margin-top: 20px;
+            text-align: left;
+            height: 200px;
+            overflow-y: auto;
+            border-top: 1px solid #333;
+            padding-top: 10px;
+            font-size: 14px;
+        }
+        /* Hide scrollbar for sleek look */
+        #chat-log::-webkit-scrollbar { width: 5px; }
+        #chat-log::-webkit-scrollbar-thumb { background: #333; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h3>VOICE CONNECTED</h3>
+        <p>Agent: <strong style="color:white; text-transform:uppercase;">{{ agent_name }}</strong></p>
+        
+        <div id="avatar" class="agent-visual"></div>
+        <div class="status-text" id="status">Tap Mic to Speak...</div>
+
+        <button id="micBtn" class="mic-btn" onclick="toggleVoice()">🎤</button>
+        
+        <div id="chat-log">
+            <p style="color: #00ffcc;"><strong>AI:</strong> Hello! My name is {{ agent_name }}. How can I help you today?</p>
+        </div>
+    </div>
+
+    <script>
+        // WEB SPEECH API SETUP
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        const micBtn = document.getElementById('micBtn');
+        const statusText = document.getElementById('status');
+        const avatar = document.getElementById('avatar');
+        const chatLog = document.getElementById('chat-log');
+        let isListening = false;
+
+        // Start Listening
+        recognition.onstart = function() {
+            isListening = true;
+            micBtn.classList.add("listening");
+            statusText.textContent = "Listening...";
+            avatar.classList.add("speaking"); 
+        };
+
+        // Stop Listening
+        recognition.onend = function() {
+            isListening = false;
+            micBtn.classList.remove("listening");
+            avatar.classList.remove("speaking");
+            statusText.textContent = "Processing...";
+        };
+
+        // Handle Result
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            
+            // Display User Text
+            chatLog.innerHTML += "<p style='color:white;'><strong>You:</strong> " + transcript + "</p>";
+            chatLog.scrollTop = chatLog.scrollHeight;
+
+            // Send to Backend
+            sendToAI(transcript);
+        };
+
+        function toggleVoice() {
+            if (isListening) { recognition.stop(); } 
+            else { recognition.start(); }
+        }
+
+        function sendToAI(text) {
+            fetch('/process_chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'user_input=' + encodeURIComponent(text)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display AI Text
+                chatLog.innerHTML += "<p style='color:#00ffcc'><strong>" + data.agent + ":</strong> " + data.response + "</p>";
+                chatLog.scrollTop = chatLog.scrollHeight;
+                
+                // Speak AI Response
+                speakResponse(data.response);
+                statusText.textContent = "Tap Mic to Reply";
+            });
+        }
+
+        function speakResponse(text) {
+            const speech = new SpeechSynthesisUtterance();
+            speech.text = text;
+            speech.volume = 1;
+            speech.rate = 1;
+            speech.pitch = 1;
+            
+            // Choose a random voice if available (optional)
+            // const voices = window.speechSynthesis.getVoices();
+            // speech.voice = voices[0]; 
+
+            avatar.classList.add("speaking");
+            speech.onend = function() {
+                avatar.classList.remove("speaking");
+            };
+            window.speechSynthesis.speak(speech);
+        }
+    </script>
+
+    <!-- Vercel Web Analytics -->
+    <script>
+        // Vercel Web Analytics Integration
+        // Tracks Web Vitals and user interactions
+        (function() {
+            const ANALYTICS_ENDPOINT = 'https://vitals.vercel-analytics.com/v1/web';
+            
+            // Helper function to send analytics data
+            function trackEvent(eventName, eventData = {}) {
+                if (!navigator.sendBeacon) return;
+                
+                const payload = new FormData();
+                payload.append('dsn', eventData.dsn || '');
+                payload.append('id', eventData.id || 'default');
+                payload.append('page', window.location.pathname);
+                payload.append('href', window.location.href);
+                payload.append('event_name', eventName);
+                payload.append('timestamp', Date.now());
+                
+                // Safely send the beacon
+                try {
+                    navigator.sendBeacon(ANALYTICS_ENDPOINT, payload);
+                } catch (e) {
+                    console.debug('[Analytics] Failed to send event:', e);
+                }
+            }
+            
+            // Track page view when page loads
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    trackEvent('pageview', { page: document.title });
+                });
+            } else {
+                trackEvent('pageview', { page: document.title });
+            }
+            
+            // Track user voice interactions
+            const micBtn = document.getElementById('micBtn');
+            if (micBtn) {
+                micBtn.addEventListener('click', () => {
+                    trackEvent('voice_interaction');
+                });
+            }
+            
+            // Make trackEvent available globally for additional tracking
+            window.trackAnalyticsEvent = trackEvent;
+        })();
+    </script>
+</body>
+</html>
