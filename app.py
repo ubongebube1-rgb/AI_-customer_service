@@ -1,7 +1,7 @@
 import random
 from flask import Flask, render_template, request, jsonify
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='app/templates', static_folder='app/static')
 
 # --- SUB-AI 1: THE RESEARCHER (Knowledge Base) ---
 # Simulates searching a database or Google for answers
